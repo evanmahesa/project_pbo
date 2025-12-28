@@ -1,0 +1,618 @@
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
+import 'package:project_pbo/login.dart';
+
+class Signup extends StatefulWidget {
+  const Signup({super.key});
+
+  @override
+  State<Signup> createState() => _SignupState();
+}
+
+class _SignupState extends State<Signup> {
+  TextEditingController email = TextEditingController();
+  TextEditingController password = TextEditingController();
+  TextEditingController nama = TextEditingController();
+
+  // Controller untuk Siswa
+  TextEditingController nis = TextEditingController();
+
+  // Controller untuk Guru
+  TextEditingController nip = TextEditingController();
+
+  String selectedRole = 'siswa'; // default role
+  bool isLoading = false;
+  bool isPasswordVisible = false;
+
+  Signup() async {
+    if (email.text.isEmpty || password.text.isEmpty || nama.text.isEmpty) {
+      Get.snackbar(
+        'Error',
+        'Semua field harus diisi',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    if (selectedRole == 'siswa' && nis.text.isEmpty) {
+      Get.snackbar(
+        'Error',
+        'NIS harus diisi',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    if (selectedRole == 'guru' && nip.text.isEmpty) {
+      Get.snackbar(
+        'Error',
+        'NIP harus diisi',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      // Buat user di Firebase Authentication
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: email.text,
+            password: password.text,
+          );
+
+      // Simpan data tambahan ke Firestore
+      Map<String, dynamic> userData = {
+        'email': email.text,
+        'nama': nama.text,
+        'role': selectedRole,
+        'createdAt': FieldValue.serverTimestamp(),
+      };
+
+      if (selectedRole == 'siswa') {
+        userData['nis'] = nis.text;
+      } else {
+        userData['nip'] = nip.text;
+      }
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .set(userData);
+
+      Get.snackbar(
+        'Success',
+        'Akun berhasil dibuat',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+
+      // Arahkan ke halaman login
+      Get.offAll(() => Login());
+    } on FirebaseAuthException catch (e) {
+      String message = 'Terjadi kesalahan';
+      if (e.code == 'weak-password') {
+        message = 'Password terlalu lemah';
+      } else if (e.code == 'email-already-in-use') {
+        message = 'Email sudah digunakan';
+      }
+      Get.snackbar(
+        'Error',
+        message,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Terjadi kesalahan: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF1DE9B6), // Bright Turquoise
+              Color(0xFF00BFA5), // Teal
+              Color(0xFF00897B), // Deep Teal
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 32),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          SizedBox(height: 30),
+                          // Back button
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.arrow_back,
+                                color: Colors.white,
+                                size: 28,
+                              ),
+                              onPressed: () => Get.back(),
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          // Title
+                          Text(
+                            'E.S.J.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 50,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              letterSpacing: 6,
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black.withOpacity(0.3),
+                                  offset: Offset(0, 4),
+                                  blurRadius: 8,
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'English Study Junior',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'Create Account',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 22,
+                              color: Color(0xFFFFD54F),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 32),
+
+                          // Pilihan Role
+                          Row(
+                            children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      selectedRole = 'siswa';
+                                    });
+                                  },
+                                  child: AnimatedContainer(
+                                    duration: Duration(milliseconds: 300),
+                                    padding: EdgeInsets.symmetric(vertical: 14),
+                                    decoration: BoxDecoration(
+                                      gradient: selectedRole == 'siswa'
+                                          ? LinearGradient(
+                                              colors: [
+                                                Color(0xFFFFD54F),
+                                                Color(0xFFFFB300),
+                                              ],
+                                            )
+                                          : null,
+                                      color: selectedRole == 'siswa'
+                                          ? null
+                                          : Colors.white.withOpacity(0.3),
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
+                                        color: Colors.white.withOpacity(0.5),
+                                        width: 2,
+                                      ),
+                                      boxShadow: selectedRole == 'siswa'
+                                          ? [
+                                              BoxShadow(
+                                                color: Color(
+                                                  0xFFFFB300,
+                                                ).withOpacity(0.4),
+                                                blurRadius: 8,
+                                                offset: Offset(0, 4),
+                                              ),
+                                            ]
+                                          : [],
+                                    ),
+                                    child: Text(
+                                      'Siswa',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 16),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      selectedRole = 'guru';
+                                    });
+                                  },
+                                  child: AnimatedContainer(
+                                    duration: Duration(milliseconds: 300),
+                                    padding: EdgeInsets.symmetric(vertical: 14),
+                                    decoration: BoxDecoration(
+                                      gradient: selectedRole == 'guru'
+                                          ? LinearGradient(
+                                              colors: [
+                                                Color(0xFFFFD54F),
+                                                Color(0xFFFFB300),
+                                              ],
+                                            )
+                                          : null,
+                                      color: selectedRole == 'guru'
+                                          ? null
+                                          : Colors.white.withOpacity(0.3),
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
+                                        color: Colors.white.withOpacity(0.5),
+                                        width: 2,
+                                      ),
+                                      boxShadow: selectedRole == 'guru'
+                                          ? [
+                                              BoxShadow(
+                                                color: Color(
+                                                  0xFFFFB300,
+                                                ).withOpacity(0.4),
+                                                blurRadius: 8,
+                                                offset: Offset(0, 4),
+                                              ),
+                                            ]
+                                          : [],
+                                    ),
+                                    child: Text(
+                                      'Guru',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 24),
+
+                          // Nama Field
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 10,
+                                  offset: Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: TextField(
+                              controller: nama,
+                              style: TextStyle(
+                                color: Color(0xFF00897B),
+                                fontSize: 16,
+                              ),
+                              decoration: InputDecoration(
+                                hintText: 'Nama Lengkap',
+                                hintStyle: TextStyle(
+                                  color: Color(0xFF00897B).withOpacity(0.5),
+                                ),
+                                prefixIcon: Icon(
+                                  Icons.person_outline,
+                                  color: Color(0xFF00BFA5),
+                                ),
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 20,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 16),
+
+                          // Email Field
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 10,
+                                  offset: Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: TextField(
+                              controller: email,
+                              keyboardType: TextInputType.emailAddress,
+                              style: TextStyle(
+                                color: Color(0xFF00897B),
+                                fontSize: 16,
+                              ),
+                              decoration: InputDecoration(
+                                hintText: 'Email',
+                                hintStyle: TextStyle(
+                                  color: Color(0xFF00897B).withOpacity(0.5),
+                                ),
+                                prefixIcon: Icon(
+                                  Icons.email_outlined,
+                                  color: Color(0xFF00BFA5),
+                                ),
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 20,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 16),
+
+                          // Password Field
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 10,
+                                  offset: Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: TextField(
+                              controller: password,
+                              obscureText: !isPasswordVisible,
+                              style: TextStyle(
+                                color: Color(0xFF00897B),
+                                fontSize: 16,
+                              ),
+                              decoration: InputDecoration(
+                                hintText: 'Password',
+                                hintStyle: TextStyle(
+                                  color: Color(0xFF00897B).withOpacity(0.5),
+                                ),
+                                prefixIcon: Icon(
+                                  Icons.lock_outline,
+                                  color: Color(0xFF00BFA5),
+                                ),
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 20,
+                                ),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    isPasswordVisible
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    color: Color(0xFF00BFA5),
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      isPasswordVisible = !isPasswordVisible;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 16),
+
+                          // Field Khusus berdasarkan Role
+                          if (selectedRole == 'siswa')
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: TextField(
+                                controller: nis,
+                                style: TextStyle(
+                                  color: Color(0xFF00897B),
+                                  fontSize: 16,
+                                ),
+                                decoration: InputDecoration(
+                                  hintText: 'NIS (Nomor Induk Siswa)',
+                                  hintStyle: TextStyle(
+                                    color: Color(0xFF00897B).withOpacity(0.5),
+                                  ),
+                                  prefixIcon: Icon(
+                                    Icons.badge_outlined,
+                                    color: Color(0xFF00BFA5),
+                                  ),
+                                  border: InputBorder.none,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 20,
+                                  ),
+                                ),
+                              ),
+                            )
+                          else
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: TextField(
+                                controller: nip,
+                                style: TextStyle(
+                                  color: Color(0xFF00897B),
+                                  fontSize: 16,
+                                ),
+                                decoration: InputDecoration(
+                                  hintText: 'NIP (Nomor Induk Pegawai)',
+                                  hintStyle: TextStyle(
+                                    color: Color(0xFF00897B).withOpacity(0.5),
+                                  ),
+                                  prefixIcon: Icon(
+                                    Icons.work_outline,
+                                    color: Color(0xFF00BFA5),
+                                  ),
+                                  border: InputBorder.none,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 20,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          SizedBox(height: 32),
+
+                          // Sign Up Button
+                          Container(
+                            width: double.infinity,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Color(0xFFFFD54F), Color(0xFFFFB300)],
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0xFFFFB300).withOpacity(0.4),
+                                  blurRadius: 12,
+                                  offset: Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: ElevatedButton(
+                              onPressed: isLoading ? null : (() => Signup()),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                shadowColor: Colors.transparent,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                              child: isLoading
+                                  ? SizedBox(
+                                      height: 24,
+                                      width: 24,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 3,
+                                      ),
+                                    )
+                                  : Text(
+                                      'Sign Up',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                        letterSpacing: 1,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                          SizedBox(height: 24),
+
+                          // Sign In Text
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Already have an account? ",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => Get.back(),
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.zero,
+                                  minimumSize: Size(0, 0),
+                                ),
+                                child: Text(
+                                  'Sign In',
+                                  style: TextStyle(
+                                    color: Color(0xFFFFD54F),
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 30),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
