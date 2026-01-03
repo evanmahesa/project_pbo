@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:project_pbo/wrapper.dart';
 import 'package:project_pbo/forgot.dart';
 import 'package:project_pbo/signup.dart';
 
@@ -45,6 +46,9 @@ class _LoginState extends State<Login> {
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
+
+      // Navigate to Wrapper so the app resolves role and shows the correct main page
+      Get.offAll(() => const Wrapper());
     } on FirebaseAuthException catch (e) {
       String message = 'Terjadi kesalahan';
       if (e.code == 'user-not-found') {
