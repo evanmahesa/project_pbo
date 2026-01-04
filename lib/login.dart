@@ -47,7 +47,6 @@ class _LoginState extends State<Login> {
         colorText: Colors.white,
       );
 
-      // Navigate to Wrapper so the app resolves role and shows the correct main page
       Get.offAll(() => const Wrapper());
     } on FirebaseAuthException catch (e) {
       String message = 'Terjadi kesalahan';
@@ -90,11 +89,7 @@ class _LoginState extends State<Login> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF1DE9B6), // Bright Turquoise
-              Color(0xFF00BFA5), // Teal
-              Color(0xFF00897B), // Deep Teal
-            ],
+            colors: [Color(0xFF1DE9B6), Color(0xFF00BFA5), Color(0xFF00897B)],
           ),
         ),
         child: SafeArea(
@@ -105,7 +100,6 @@ class _LoginState extends State<Login> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(height: 40),
-                  // Logo/Icon with shadow
                   Container(
                     padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -126,7 +120,6 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                   SizedBox(height: 24),
-                  // Logo/Title
                   Text(
                     'E.S.J.',
                     style: TextStyle(
@@ -155,7 +148,6 @@ class _LoginState extends State<Login> {
                   ),
                   SizedBox(height: 60),
 
-                  // Email Field
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -191,7 +183,6 @@ class _LoginState extends State<Login> {
                   ),
                   SizedBox(height: 20),
 
-                  // Password Field
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -240,7 +231,6 @@ class _LoginState extends State<Login> {
                   ),
                   SizedBox(height: 12),
 
-                  // Forgot Password
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
@@ -257,7 +247,6 @@ class _LoginState extends State<Login> {
                   ),
                   SizedBox(height: 24),
 
-                  // Sign In Button
                   Container(
                     width: double.infinity,
                     height: 60,
@@ -305,7 +294,6 @@ class _LoginState extends State<Login> {
                   ),
                   SizedBox(height: 32),
 
-                  // Sign Up Text
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

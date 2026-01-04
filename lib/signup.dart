@@ -16,13 +16,11 @@ class _SignupState extends State<Signup> {
   TextEditingController password = TextEditingController();
   TextEditingController nama = TextEditingController();
 
-  // Controller untuk Siswa
   TextEditingController nis = TextEditingController();
 
-  // Controller untuk Guru
   TextEditingController nip = TextEditingController();
 
-  String selectedRole = 'siswa'; // default role
+  String selectedRole = 'siswa';
   bool isLoading = false;
   bool isPasswordVisible = false;
 
@@ -65,14 +63,12 @@ class _SignupState extends State<Signup> {
     });
 
     try {
-      // Buat user di Firebase Authentication
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
             email: email.text,
             password: password.text,
           );
 
-      // Simpan data tambahan ke Firestore
       Map<String, dynamic> userData = {
         'email': email.text,
         'nama': nama.text,
@@ -99,7 +95,6 @@ class _SignupState extends State<Signup> {
         colorText: Colors.white,
       );
 
-      // Arahkan ke halaman login
       Get.offAll(() => Login());
     } on FirebaseAuthException catch (e) {
       String message = 'Terjadi kesalahan';
@@ -138,11 +133,7 @@ class _SignupState extends State<Signup> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF1DE9B6), // Bright Turquoise
-              Color(0xFF00BFA5), // Teal
-              Color(0xFF00897B), // Deep Teal
-            ],
+            colors: [Color(0xFF1DE9B6), Color(0xFF00BFA5), Color(0xFF00897B)],
           ),
         ),
         child: SafeArea(
@@ -158,7 +149,7 @@ class _SignupState extends State<Signup> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           SizedBox(height: 30),
-                          // Back button
+
                           Align(
                             alignment: Alignment.centerLeft,
                             child: IconButton(
@@ -171,7 +162,7 @@ class _SignupState extends State<Signup> {
                             ),
                           ),
                           SizedBox(height: 10),
-                          // Title
+
                           Text(
                             'E.S.J.',
                             textAlign: TextAlign.center,
@@ -212,7 +203,6 @@ class _SignupState extends State<Signup> {
                           ),
                           SizedBox(height: 32),
 
-                          // Pilihan Role
                           Row(
                             children: [
                               Expanded(
@@ -322,7 +312,6 @@ class _SignupState extends State<Signup> {
                           ),
                           SizedBox(height: 24),
 
-                          // Nama Field
                           Container(
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -360,7 +349,6 @@ class _SignupState extends State<Signup> {
                           ),
                           SizedBox(height: 16),
 
-                          // Email Field
                           Container(
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -399,7 +387,6 @@ class _SignupState extends State<Signup> {
                           ),
                           SizedBox(height: 16),
 
-                          // Password Field
                           Container(
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -451,7 +438,6 @@ class _SignupState extends State<Signup> {
                           ),
                           SizedBox(height: 16),
 
-                          // Field Khusus berdasarkan Role
                           if (selectedRole == 'siswa')
                             Container(
                               decoration: BoxDecoration(
@@ -525,8 +511,6 @@ class _SignupState extends State<Signup> {
                               ),
                             ),
                           SizedBox(height: 32),
-
-                          // Sign Up Button
                           Container(
                             width: double.infinity,
                             height: 60,
@@ -574,7 +558,6 @@ class _SignupState extends State<Signup> {
                           ),
                           SizedBox(height: 24),
 
-                          // Sign In Text
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

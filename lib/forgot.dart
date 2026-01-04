@@ -46,7 +46,6 @@ class _ForgotState extends State<Forgot> {
         duration: Duration(seconds: 3),
       );
 
-      // Tunggu 3 detik lalu redirect ke login
       Future.delayed(Duration(seconds: 3), () {
         Get.offAll(() => Login());
       });
@@ -92,11 +91,7 @@ class _ForgotState extends State<Forgot> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF1DE9B6), // Bright Turquoise
-              Color(0xFF00BFA5), // Teal
-              Color(0xFF00897B), // Deep Teal
-            ],
+            colors: [Color(0xFF1DE9B6), Color(0xFF00BFA5), Color(0xFF00897B)],
           ),
         ),
         child: SafeArea(
@@ -107,7 +102,6 @@ class _ForgotState extends State<Forgot> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(height: 40),
-                  // Back button
                   Align(
                     alignment: Alignment.centerLeft,
                     child: IconButton(
@@ -120,7 +114,6 @@ class _ForgotState extends State<Forgot> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  // Icon
                   Container(
                     padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -141,7 +134,6 @@ class _ForgotState extends State<Forgot> {
                     ),
                   ),
                   SizedBox(height: 32),
-                  // Title
                   Text(
                     'E.S.J.',
                     style: TextStyle(
@@ -185,7 +177,6 @@ class _ForgotState extends State<Forgot> {
                   ),
                   SizedBox(height: 40),
 
-                  // Email Field
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -221,7 +212,6 @@ class _ForgotState extends State<Forgot> {
                   ),
                   SizedBox(height: 32),
 
-                  // Send Link Button
                   Container(
                     width: double.infinity,
                     height: 60,
@@ -269,7 +259,6 @@ class _ForgotState extends State<Forgot> {
                   ),
                   SizedBox(height: 24),
 
-                  // Back to Login
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
