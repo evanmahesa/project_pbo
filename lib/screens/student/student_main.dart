@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:project_pbo/student/dashboard_student.dart';
-import 'package:project_pbo/student/tugas_student.dart';
-import 'package:project_pbo/student/profile_student.dart';
+import 'package:project_pbo/screens/student/dashboard_student.dart';
+import 'package:project_pbo/screens/student/tugas_student.dart';
+import 'package:project_pbo/screens/student/profile_student.dart';
 
 // MATERI: INHERITANCE - StudentMain extends StatefulWidget
 class StudentMain extends StatefulWidget {

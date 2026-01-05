@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-import 'package:project_pbo/teacher/tambah_materi.dart';
-import 'package:project_pbo/teacher/edit_materi.dart';
+import 'package:project_pbo/screens/teacher/tambah_materi.dart';
+import 'package:project_pbo/screens/teacher/edit_materi.dart';
 
 // MATERI: INHERITANCE
 class KelolaMateri extends StatelessWidget {

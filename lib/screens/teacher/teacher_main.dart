@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:project_pbo/teacher/dashboard_teacher.dart';
-import 'package:project_pbo/teacher/kelola_materi.dart';
-import 'package:project_pbo/teacher/profile_teacher.dart';
+import 'package:project_pbo/screens/teacher/dashboard_teacher.dart';
+import 'package:project_pbo/screens/teacher/kelola_materi.dart';
+import 'package:project_pbo/screens/teacher/profile_teacher.dart';
 
 // MATERI: INHERITANCE
 class TeacherMain extends StatefulWidget {

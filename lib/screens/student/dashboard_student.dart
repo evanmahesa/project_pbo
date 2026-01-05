@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
-import 'package:project_pbo/student/materi_list.dart';
+import 'package:project_pbo/screens/student/materi_list.dart';
 
 // MATERI: INHERITANCE - DashboardStudent extends StatefulWidget
 class DashboardStudent extends StatefulWidget {

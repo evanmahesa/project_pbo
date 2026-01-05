@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:project_pbo/services/api_service.dart';
 import 'package:get/get.dart';
-import 'package:project_pbo/login.dart';
+import 'package:project_pbo/screens/auth/login.dart';
 
 class Forgot extends StatefulWidget {
   const Forgot({super.key});
@@ -13,7 +14,7 @@ class Forgot extends StatefulWidget {
 class _ForgotState extends State<Forgot> {
   TextEditingController email = TextEditingController();
   bool isLoading = false;
-
+  final AuthService _authService = AuthService();
   reset() async {
     if (email.text.isEmpty) {
       Get.snackbar(
@@ -31,7 +32,7 @@ class _ForgotState extends State<Forgot> {
     });
 
     try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: email.text);
+      await _authService.resetPassword(email.text);
 
       setState(() {
         isLoading = false;

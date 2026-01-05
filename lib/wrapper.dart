@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:project_pbo/services/api_service.dart';
+import 'package:project_pbo/models/user_model.dart';
 import 'package:get/get.dart';
-import 'package:project_pbo/login.dart';
-import 'package:project_pbo/student/student_main.dart';
-import 'package:project_pbo/teacher/teacher_main.dart';
+import 'package:project_pbo/screens/auth/login.dart';
+import 'package:project_pbo/screens/student/student_main.dart';
+import 'package:project_pbo/screens/teacher/teacher_main.dart';
 
 class Wrapper extends StatelessWidget {
   const Wrapper({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final AuthService _authService = AuthService();
+    final UserService _userService = UserService();
     return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
+      stream: _authService.authStateChanges,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
@@ -37,11 +40,9 @@ class RoleChecker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<DocumentSnapshot>(
-      future: FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get(),
+    final UserService _userService = UserService();
+    return FutureBuilder<UserModel?>(
+      future: _userService.getUserData(user.uid),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
@@ -92,25 +93,21 @@ class RoleChecker extends StatelessWidget {
           );
         }
 
-        if (!snapshot.hasData ||
-            snapshot.data == null ||
-            !snapshot.data!.exists ||
-            snapshot.data!.data() == null) {
-          Map<String, dynamic> fallback = {
-            'email': user.email,
-            'role': 'siswa',
-            'uid': user.uid,
-          };
-          return StudentMain(userData: fallback);
+        if (!snapshot.hasData || snapshot.data == null) {
+          UserModel fallback = UserModel(
+            uid: user.uid,
+            email: user.email ?? '',
+            nama: '',
+            role: 'siswa',
+          );
+          return StudentMain(userData: fallback.toMap());
         }
 
-        Map<String, dynamic> userData =
-            snapshot.data!.data() as Map<String, dynamic>;
-        String role = userData['role'] ?? 'siswa';
-        if (role == 'guru') {
-          return TeacherMain(userData: userData);
+        UserModel userData = snapshot.data!;
+        if (userData.role == 'guru') {
+          return TeacherMain(userData: userData.toMap());
         } else {
-          return StudentMain(userData: userData);
+          return StudentMain(userData: userData.toMap());
         }
       },
     );

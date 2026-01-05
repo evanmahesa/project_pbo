@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:project_pbo/services/api_service.dart';
+import 'package:project_pbo/models/user_model.dart';
 import 'package:get/get.dart';
-import 'package:project_pbo/login.dart';
+import 'package:project_pbo/screens/auth/login.dart';
+import 'package:project_pbo/widgets/custom_button.dart';
+import 'package:project_pbo/widgets/custom_text_field.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -15,14 +18,15 @@ class _SignupState extends State<Signup> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
   TextEditingController nama = TextEditingController();
-
   TextEditingController nis = TextEditingController();
-
   TextEditingController nip = TextEditingController();
 
   String selectedRole = 'siswa';
   bool isLoading = false;
   bool isPasswordVisible = false;
+
+  final AuthService _authService = AuthService();
+  final UserService _userService = UserService();
 
   Signup() async {
     if (email.text.isEmpty || password.text.isEmpty || nama.text.isEmpty) {
@@ -63,29 +67,21 @@ class _SignupState extends State<Signup> {
     });
 
     try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-            email: email.text,
-            password: password.text,
-          );
+      UserCredential userCredential = await _authService.signUp(
+        email.text,
+        password.text,
+      );
 
-      Map<String, dynamic> userData = {
-        'email': email.text,
-        'nama': nama.text,
-        'role': selectedRole,
-        'createdAt': FieldValue.serverTimestamp(),
-      };
+      UserModel newUser = UserModel(
+        uid: userCredential.user!.uid,
+        email: email.text,
+        nama: nama.text,
+        role: selectedRole,
+        nis: selectedRole == 'siswa' ? nis.text : null,
+        nip: selectedRole == 'guru' ? nip.text : null,
+      );
 
-      if (selectedRole == 'siswa') {
-        userData['nis'] = nis.text;
-      } else {
-        userData['nip'] = nip.text;
-      }
-
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userCredential.user!.uid)
-          .set(userData);
+      await _userService.createUserData(newUser);
 
       Get.snackbar(
         'Success',
@@ -312,249 +308,57 @@ class _SignupState extends State<Signup> {
                           ),
                           SizedBox(height: 24),
 
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 10,
-                                  offset: Offset(0, 5),
-                                ),
-                              ],
-                            ),
-                            child: TextField(
-                              controller: nama,
-                              style: TextStyle(
-                                color: Color(0xFF00897B),
-                                fontSize: 16,
-                              ),
-                              decoration: InputDecoration(
-                                hintText: 'Nama Lengkap',
-                                hintStyle: TextStyle(
-                                  color: Color(0xFF00897B).withOpacity(0.5),
-                                ),
-                                prefixIcon: Icon(
-                                  Icons.person_outline,
-                                  color: Color(0xFF00BFA5),
-                                ),
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                  vertical: 20,
-                                ),
-                              ),
-                            ),
+                          CustomTextField(
+                            controller: nama,
+                            hintText: 'Nama Lengkap',
+                            prefixIcon: Icons.person_outline,
                           ),
                           SizedBox(height: 16),
-
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 10,
-                                  offset: Offset(0, 5),
-                                ),
-                              ],
-                            ),
-                            child: TextField(
-                              controller: email,
-                              keyboardType: TextInputType.emailAddress,
-                              style: TextStyle(
-                                color: Color(0xFF00897B),
-                                fontSize: 16,
-                              ),
-                              decoration: InputDecoration(
-                                hintText: 'Email',
-                                hintStyle: TextStyle(
-                                  color: Color(0xFF00897B).withOpacity(0.5),
-                                ),
-                                prefixIcon: Icon(
-                                  Icons.email_outlined,
-                                  color: Color(0xFF00BFA5),
-                                ),
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                  vertical: 20,
-                                ),
-                              ),
-                            ),
+                          CustomTextField(
+                            controller: email,
+                            hintText: 'Email',
+                            prefixIcon: Icons.email_outlined,
+                            keyboardType: TextInputType.emailAddress,
                           ),
                           SizedBox(height: 16),
-
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 10,
-                                  offset: Offset(0, 5),
-                                ),
-                              ],
-                            ),
-                            child: TextField(
-                              controller: password,
-                              obscureText: !isPasswordVisible,
-                              style: TextStyle(
-                                color: Color(0xFF00897B),
-                                fontSize: 16,
+                          CustomTextField(
+                            controller: password,
+                            hintText: 'Password',
+                            prefixIcon: Icons.lock_outline,
+                            obscureText: !isPasswordVisible,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                isPasswordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                color: Color(0xFF00BFA5),
                               ),
-                              decoration: InputDecoration(
-                                hintText: 'Password',
-                                hintStyle: TextStyle(
-                                  color: Color(0xFF00897B).withOpacity(0.5),
-                                ),
-                                prefixIcon: Icon(
-                                  Icons.lock_outline,
-                                  color: Color(0xFF00BFA5),
-                                ),
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                  vertical: 20,
-                                ),
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    isPasswordVisible
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                    color: Color(0xFF00BFA5),
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      isPasswordVisible = !isPasswordVisible;
-                                    });
-                                  },
-                                ),
-                              ),
+                              onPressed: () {
+                                setState(() {
+                                  isPasswordVisible = !isPasswordVisible;
+                                });
+                              },
                             ),
                           ),
                           SizedBox(height: 16),
 
                           if (selectedRole == 'siswa')
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 10,
-                                    offset: Offset(0, 5),
-                                  ),
-                                ],
-                              ),
-                              child: TextField(
-                                controller: nis,
-                                style: TextStyle(
-                                  color: Color(0xFF00897B),
-                                  fontSize: 16,
-                                ),
-                                decoration: InputDecoration(
-                                  hintText: 'NIS (Nomor Induk Siswa)',
-                                  hintStyle: TextStyle(
-                                    color: Color(0xFF00897B).withOpacity(0.5),
-                                  ),
-                                  prefixIcon: Icon(
-                                    Icons.badge_outlined,
-                                    color: Color(0xFF00BFA5),
-                                  ),
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 20,
-                                    vertical: 20,
-                                  ),
-                                ),
-                              ),
+                            CustomTextField(
+                              controller: nis,
+                              hintText: 'NIS (Nomor Induk Siswa)',
+                              prefixIcon: Icons.badge_outlined,
                             )
                           else
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 10,
-                                    offset: Offset(0, 5),
-                                  ),
-                                ],
-                              ),
-                              child: TextField(
-                                controller: nip,
-                                style: TextStyle(
-                                  color: Color(0xFF00897B),
-                                  fontSize: 16,
-                                ),
-                                decoration: InputDecoration(
-                                  hintText: 'NIP (Nomor Induk Pegawai)',
-                                  hintStyle: TextStyle(
-                                    color: Color(0xFF00897B).withOpacity(0.5),
-                                  ),
-                                  prefixIcon: Icon(
-                                    Icons.work_outline,
-                                    color: Color(0xFF00BFA5),
-                                  ),
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 20,
-                                    vertical: 20,
-                                  ),
-                                ),
-                              ),
+                            CustomTextField(
+                              controller: nip,
+                              hintText: 'NIP (Nomor Induk Pegawai)',
+                              prefixIcon: Icons.work_outline,
                             ),
                           SizedBox(height: 32),
-                          Container(
-                            width: double.infinity,
-                            height: 60,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [Color(0xFFFFD54F), Color(0xFFFFB300)],
-                              ),
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color(0xFFFFB300).withOpacity(0.4),
-                                  blurRadius: 12,
-                                  offset: Offset(0, 6),
-                                ),
-                              ],
-                            ),
-                            child: ElevatedButton(
-                              onPressed: isLoading ? null : (() => Signup()),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                              ),
-                              child: isLoading
-                                  ? SizedBox(
-                                      height: 24,
-                                      width: 24,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 3,
-                                      ),
-                                    )
-                                  : Text(
-                                      'Sign Up',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                        letterSpacing: 1,
-                                      ),
-                                    ),
-                            ),
+                          CustomButton(
+                            text: 'Sign Up',
+                            isLoading: isLoading,
+                            onPressed: Signup,
                           ),
                           SizedBox(height: 24),
 
