@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:project_pbo/screens/auth/login.dart';
 
-// MATERI: INHERITANCE
 class ProfileTeacher extends StatefulWidget {
   final Map<String, dynamic> userData;
 
@@ -14,7 +13,6 @@ class ProfileTeacher extends StatefulWidget {
   State<ProfileTeacher> createState() => _ProfileTeacherState();
 }
 
-// MATERI: ENCAPSULATION
 class _ProfileTeacherState extends State<ProfileTeacher> {
   bool _isEditing = false;
   late TextEditingController _namaController;
@@ -34,7 +32,6 @@ class _ProfileTeacherState extends State<ProfileTeacher> {
     super.dispose();
   }
 
-  // MATERI: ASYNC & AWAIT
   Future<void> _updateProfile() async {
     try {
       String uid = FirebaseAuth.instance.currentUser!.uid;
@@ -111,7 +108,6 @@ class _ProfileTeacherState extends State<ProfileTeacher> {
     );
   }
 
-  // MATERI: ASYNC & AWAIT - Logout
   Future<void> _logout() async {
     await FirebaseAuth.instance.signOut();
     Get.offAll(() => Login());
@@ -133,7 +129,6 @@ class _ProfileTeacherState extends State<ProfileTeacher> {
             child: Column(
               children: [
                 SizedBox(height: 20),
-                // Profile Header
                 CircleAvatar(
                   radius: 60,
                   backgroundColor: Colors.white,
@@ -169,7 +164,6 @@ class _ProfileTeacherState extends State<ProfileTeacher> {
                 ),
                 SizedBox(height: 24),
 
-                // Profile Info
                 Container(
                   margin: EdgeInsets.all(16),
                   padding: EdgeInsets.all(20),
@@ -227,7 +221,6 @@ class _ProfileTeacherState extends State<ProfileTeacher> {
                   ),
                 ),
 
-                // Statistik Mengajar
                 Container(
                   margin: EdgeInsets.symmetric(horizontal: 16),
                   padding: EdgeInsets.all(20),
@@ -254,7 +247,6 @@ class _ProfileTeacherState extends State<ProfileTeacher> {
                         ),
                       ),
                       SizedBox(height: 16),
-                      // MATERI: ASYNC - StreamBuilder
                       StreamBuilder<QuerySnapshot>(
                         stream: FirebaseFirestore.instance
                             .collection('materi')
@@ -295,7 +287,6 @@ class _ProfileTeacherState extends State<ProfileTeacher> {
                 ),
                 SizedBox(height: 16),
 
-                // Change Password
                 Container(
                   margin: EdgeInsets.symmetric(horizontal: 16),
                   width: double.infinity,
@@ -327,7 +318,6 @@ class _ProfileTeacherState extends State<ProfileTeacher> {
                 ),
                 SizedBox(height: 12),
 
-                // Logout Button
                 Container(
                   margin: EdgeInsets.symmetric(horizontal: 16),
                   width: double.infinity,

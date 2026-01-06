@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-// MATERI: INHERITANCE
 class DashboardTeacher extends StatelessWidget {
   final Map<String, dynamic> userData;
 
@@ -25,7 +24,6 @@ class DashboardTeacher extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -62,7 +60,6 @@ class DashboardTeacher extends StatelessWidget {
                   ),
                   SizedBox(height: 24),
 
-                  // Statistics Cards
                   Row(
                     children: [
                       Expanded(
@@ -71,7 +68,6 @@ class DashboardTeacher extends StatelessWidget {
                           Icons.people,
                           Color(0xFFFFD54F),
                           StreamBuilder<QuerySnapshot>(
-                            // MATERI: ASYNC - Real-time counting
                             stream: FirebaseFirestore.instance
                                 .collection('users')
                                 .where('role', isEqualTo: 'siswa')
@@ -118,7 +114,6 @@ class DashboardTeacher extends StatelessWidget {
                   ),
                   SizedBox(height: 24),
 
-                  // Laporan Nilai Section
                   Text(
                     'Laporan Nilai Siswa',
                     style: TextStyle(
@@ -129,7 +124,6 @@ class DashboardTeacher extends StatelessWidget {
                   ),
                   SizedBox(height: 16),
 
-                  // MATERI: GENERIC - StreamBuilder dengan List
                   StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
                         .collection('users')
@@ -256,7 +250,6 @@ class DashboardTeacher extends StatelessWidget {
             ],
           ),
           SizedBox(height: 12),
-          // MATERI: ASYNC - Nested StreamBuilder
           StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('hasil_belajar')

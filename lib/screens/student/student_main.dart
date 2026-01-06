@@ -3,7 +3,6 @@ import 'package:project_pbo/screens/student/dashboard_student.dart';
 import 'package:project_pbo/screens/student/tugas_student.dart';
 import 'package:project_pbo/screens/student/profile_student.dart';
 
-// MATERI: INHERITANCE - StudentMain extends StatefulWidget
 class StudentMain extends StatefulWidget {
   final Map<String, dynamic> userData;
 
@@ -13,18 +12,14 @@ class StudentMain extends StatefulWidget {
   State<StudentMain> createState() => _StudentMainState();
 }
 
-// MATERI: ENCAPSULATION - Private state class
 class _StudentMainState extends State<StudentMain> {
-  // MATERI: ENCAPSULATION - Private variable
   int _currentIndex = 0;
 
-  // MATERI: GENERIC - List<Widget> untuk halaman
   late List<Widget> _pages;
 
   @override
   void initState() {
     super.initState();
-    // Initialize pages with user data
     _pages = [
       DashboardStudent(userData: widget.userData),
       TugasStudent(userData: widget.userData),

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
-import 'package:project_pbo/screens/student/materi_list.dart';
+import 'materi_list.dart';
+import 'statistik_detail_page.dart';
 
-// MATERI: INHERITANCE - DashboardStudent extends StatefulWidget
 class DashboardStudent extends StatefulWidget {
   final Map<String, dynamic> userData;
 
@@ -14,12 +14,11 @@ class DashboardStudent extends StatefulWidget {
   State<DashboardStudent> createState() => _DashboardStudentState();
 }
 
-// MATERI: ENCAPSULATION - Private state class
 class _DashboardStudentState extends State<DashboardStudent> {
-  // MATERI: ENCAPSULATION - Private variables
   int _totalMateriSelesai = 0;
   double _nilaiRataRata = 0.0;
   int _totalPoin = 0;
+  int _streak = 0;
 
   @override
   void initState() {
@@ -27,12 +26,10 @@ class _DashboardStudentState extends State<DashboardStudent> {
     _loadStatistik();
   }
 
-  // MATERI: ASYNC & AWAIT - Fungsi asynchronous untuk load data
   Future<void> _loadStatistik() async {
     try {
       String uid = FirebaseAuth.instance.currentUser!.uid;
 
-      // Get hasil belajar
       QuerySnapshot hasilSnapshot = await FirebaseFirestore.instance
           .collection('hasil_belajar')
           .doc(uid)
@@ -41,14 +38,41 @@ class _DashboardStudentState extends State<DashboardStudent> {
 
       if (hasilSnapshot.docs.isNotEmpty) {
         double totalNilai = 0;
+
+        List<DateTime> tanggalAktif = [];
         for (var doc in hasilSnapshot.docs) {
           totalNilai += (doc.data() as Map<String, dynamic>)['nilai'] ?? 0;
+          var data = doc.data() as Map<String, dynamic>;
+          if (data['timestamp'] != null) {
+            Timestamp ts = data['timestamp'];
+            tanggalAktif.add(ts.toDate());
+          }
         }
 
+        tanggalAktif.sort((a, b) => b.compareTo(a));
+        int streak = 0;
+        DateTime? prev;
+        for (var tgl in tanggalAktif) {
+          DateTime hariIni = DateTime(tgl.year, tgl.month, tgl.day);
+          if (prev == null) {
+            prev = hariIni;
+            streak = 1;
+          } else {
+            if (prev.difference(hariIni).inDays == 1) {
+              streak++;
+              prev = hariIni;
+            } else if (prev.difference(hariIni).inDays == 0) {
+              continue;
+            } else {
+              break;
+            }
+          }
+        }
         setState(() {
           _totalMateriSelesai = hasilSnapshot.docs.length;
           _nilaiRataRata = totalNilai / hasilSnapshot.docs.length;
           _totalPoin = (_nilaiRataRata * 10).toInt();
+          _streak = streak;
         });
       }
     } catch (e) {
@@ -75,7 +99,6 @@ class _DashboardStudentState extends State<DashboardStudent> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -96,22 +119,10 @@ class _DashboardStudentState extends State<DashboardStudent> {
                           ),
                         ],
                       ),
-                      Container(
-                        padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          Icons.notifications,
-                          color: Color(0xFF00897B),
-                        ),
-                      ),
                     ],
                   ),
                   SizedBox(height: 24),
 
-                  // Statistik Cards
                   Row(
                     children: [
                       Expanded(
@@ -148,7 +159,7 @@ class _DashboardStudentState extends State<DashboardStudent> {
                       Expanded(
                         child: _buildStatCard(
                           'Streak',
-                          '0 hari',
+                          '${_streak} hari',
                           Icons.local_fire_department,
                           Color(0xFFFF9F43),
                         ),
@@ -157,7 +168,6 @@ class _DashboardStudentState extends State<DashboardStudent> {
                   ),
                   SizedBox(height: 24),
 
-                  // Kategori Materi
                   Text(
                     'Kategori Materi',
                     style: TextStyle(
@@ -168,7 +178,6 @@ class _DashboardStudentState extends State<DashboardStudent> {
                   ),
                   SizedBox(height: 16),
 
-                  // MATERI: GENERIC - List dengan StreamBuilder
                   StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
                         .collection('materi')
@@ -189,7 +198,6 @@ class _DashboardStudentState extends State<DashboardStudent> {
                         );
                       }
 
-                      // MATERI: POLYMORPHISM - Grouping berdasarkan kategori (safely)
                       Map<String, List<DocumentSnapshot>> groupedMateri = {};
                       for (var doc in snapshot.data!.docs) {
                         final data = doc.data() as Map<String, dynamic>;
@@ -225,7 +233,6 @@ class _DashboardStudentState extends State<DashboardStudent> {
                   ),
                   SizedBox(height: 24),
 
-                  // Recent Activity
                   Text(
                     'Aktivitas Terakhir',
                     style: TextStyle(
@@ -245,43 +252,109 @@ class _DashboardStudentState extends State<DashboardStudent> {
     );
   }
 
-  // MATERI: ENCAPSULATION - Private helper method
   Widget _buildStatCard(
     String title,
     String value,
     IconData icon,
     Color color,
   ) {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 32),
-          SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF00897B),
+    return GestureDetector(
+      onTap: () => _navigateToStatDetail(title),
+      child: Container(
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: Offset(0, 5),
             ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 32),
+            SizedBox(height: 8),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF00897B),
+              ),
+            ),
+            SizedBox(height: 4),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _navigateToStatDetail(String title) {
+    String statType = '';
+    switch (title) {
+      case 'Materi Selesai':
+        statType = 'materi';
+        break;
+      case 'Rata-rata Nilai':
+        statType = 'nilai';
+        break;
+      case 'Total Poin':
+        statType = 'poin';
+        break;
+      case 'Streak':
+        statType = 'streak';
+        break;
+    }
+    if (statType.isNotEmpty) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => StatistikDetailPage(
+            statType: statType,
+            totalMateriSelesai: _totalMateriSelesai,
+            nilaiRataRata: _nilaiRataRata,
+            totalPoin: _totalPoin,
+            streak: _streak,
           ),
-          SizedBox(height: 4),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 12, color: Colors.grey),
+        ),
+      );
+    }
+  }
+
+  void _showStatDialog(String title) {
+    String content;
+    switch (title) {
+      case 'Materi Selesai':
+        content = 'Jumlah materi yang sudah kamu selesaikan.';
+        break;
+      case 'Rata-rata Nilai':
+        content = 'Nilai rata-rata dari semua materi yang sudah kamu kerjakan.';
+        break;
+      case 'Total Poin':
+        content = 'Total poin yang kamu dapatkan berdasarkan nilai rata-rata.';
+        break;
+      case 'Streak':
+        content = 'Jumlah hari berturut-turut kamu aktif belajar.';
+        break;
+      default:
+        content = '';
+    }
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Tutup'),
           ),
         ],
       ),

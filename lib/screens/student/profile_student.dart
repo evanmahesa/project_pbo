@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:project_pbo/screens/auth/login.dart';
 
-// MATERI: INHERITANCE
 class ProfileStudent extends StatefulWidget {
   final Map<String, dynamic> userData;
 
@@ -14,7 +13,6 @@ class ProfileStudent extends StatefulWidget {
   State<ProfileStudent> createState() => _ProfileStudentState();
 }
 
-// MATERI: ENCAPSULATION
 class _ProfileStudentState extends State<ProfileStudent> {
   bool _isEditing = false;
   late TextEditingController _namaController;
@@ -34,7 +32,6 @@ class _ProfileStudentState extends State<ProfileStudent> {
     super.dispose();
   }
 
-  // MATERI: ASYNC & AWAIT
   Future<void> _updateProfile() async {
     try {
       String uid = FirebaseAuth.instance.currentUser!.uid;
@@ -62,7 +59,6 @@ class _ProfileStudentState extends State<ProfileStudent> {
     }
   }
 
-  // MATERI: ASYNC & AWAIT - Logout
   Future<void> _logout() async {
     await FirebaseAuth.instance.signOut();
     Get.offAll(() => Login());
@@ -84,7 +80,6 @@ class _ProfileStudentState extends State<ProfileStudent> {
             child: Column(
               children: [
                 SizedBox(height: 20),
-                // Profile Header
                 CircleAvatar(
                   radius: 60,
                   backgroundColor: Colors.white,
@@ -120,7 +115,6 @@ class _ProfileStudentState extends State<ProfileStudent> {
                 ),
                 SizedBox(height: 24),
 
-                // Profile Info
                 Container(
                   margin: EdgeInsets.all(16),
                   padding: EdgeInsets.all(20),
@@ -178,7 +172,6 @@ class _ProfileStudentState extends State<ProfileStudent> {
                   ),
                 ),
 
-                // History Belajar
                 Container(
                   margin: EdgeInsets.symmetric(horizontal: 16),
                   padding: EdgeInsets.all(20),
@@ -205,7 +198,6 @@ class _ProfileStudentState extends State<ProfileStudent> {
                         ),
                       ),
                       SizedBox(height: 16),
-                      // MATERI: ASYNC - StreamBuilder
                       StreamBuilder<QuerySnapshot>(
                         stream: FirebaseFirestore.instance
                             .collection('hasil_belajar')
@@ -223,7 +215,6 @@ class _ProfileStudentState extends State<ProfileStudent> {
                             );
                           }
 
-                          // MATERI: GENERIC - List mapping
                           return Column(
                             children: snapshot.data!.docs.map((doc) {
                               Map<String, dynamic> data =
@@ -242,7 +233,6 @@ class _ProfileStudentState extends State<ProfileStudent> {
                 ),
                 SizedBox(height: 16),
 
-                // Logout Button
                 Container(
                   margin: EdgeInsets.symmetric(horizontal: 16),
                   width: double.infinity,

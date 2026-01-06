@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
-// MATERI: INHERITANCE
 class QuizPage extends StatefulWidget {
   final String materiId;
   final Map<String, dynamic> materiData;
@@ -14,15 +13,12 @@ class QuizPage extends StatefulWidget {
   State<QuizPage> createState() => _QuizPageState();
 }
 
-// MATERI: ENCAPSULATION
 class _QuizPageState extends State<QuizPage> {
   int _currentQuestion = 0;
   int _score = 0;
-  // MATERI: GENERIC - Map untuk menyimpan jawaban
   Map<int, String> _answers = {};
   bool _isFinished = false;
 
-  // MATERI: GENERIC - List soal
   late List<Map<String, dynamic>> _soal;
 
   @override
@@ -31,9 +27,7 @@ class _QuizPageState extends State<QuizPage> {
     _soal = List<Map<String, dynamic>>.from(widget.materiData['soal'] ?? []);
   }
 
-  // MATERI: ASYNC & AWAIT
   Future<void> _submitQuiz() async {
-    // Hitung score
     for (int i = 0; i < _soal.length; i++) {
       if (_answers[i] == _soal[i]['jawaban']) {
         _score++;
@@ -42,7 +36,6 @@ class _QuizPageState extends State<QuizPage> {
 
     double nilai = (_score / _soal.length) * 100;
 
-    // Simpan hasil
     try {
       String uid = FirebaseAuth.instance.currentUser!.uid;
       await FirebaseFirestore.instance
@@ -103,7 +96,6 @@ class _QuizPageState extends State<QuizPage> {
         child: SafeArea(
           child: Column(
             children: [
-              // Progress
               Container(
                 padding: EdgeInsets.all(16),
                 child: Column(
@@ -151,7 +143,6 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
 
-              // Question Card
               Expanded(
                 child: Container(
                   margin: EdgeInsets.all(16),
@@ -180,7 +171,6 @@ class _QuizPageState extends State<QuizPage> {
                           ),
                         ),
                         SizedBox(height: 24),
-                        // MATERI: GENERIC - List options
                         ...(_soal[_currentQuestion]['options'] as List)
                             .asMap()
                             .entries
@@ -257,7 +247,6 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
 
-              // Navigation Buttons
               Container(
                 padding: EdgeInsets.all(16),
                 child: Row(

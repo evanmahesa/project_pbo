@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
-// MATERI: INHERITANCE
 class TambahMateri extends StatefulWidget {
   final Map<String, dynamic> userData;
 
@@ -13,21 +12,17 @@ class TambahMateri extends StatefulWidget {
   State<TambahMateri> createState() => _TambahMateriState();
 }
 
-// MATERI: ENCAPSULATION
 class _TambahMateriState extends State<TambahMateri> {
   final _formKey = GlobalKey<FormState>();
 
-  // Controllers
   final TextEditingController _judulController = TextEditingController();
   final TextEditingController _kontenController = TextEditingController();
 
   String _selectedKategori = 'Grammar';
-  // MATERI: GENERIC - List of maps untuk soal
   List<Map<String, dynamic>> _soalList = [];
 
   bool _isLoading = false;
 
-  // MATERI: GENERIC - List kategori
   final List<String> _kategoriList = [
     'Grammar',
     'Vocabulary',
@@ -61,7 +56,6 @@ class _TambahMateriState extends State<TambahMateri> {
     );
   }
 
-  // MATERI: ASYNC & AWAIT
   Future<void> _saveMateri() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -134,7 +128,6 @@ class _TambahMateriState extends State<TambahMateri> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Judul
                 Text(
                   'Judul Materi',
                   style: TextStyle(
@@ -159,7 +152,6 @@ class _TambahMateriState extends State<TambahMateri> {
                 ),
                 SizedBox(height: 16),
 
-                // Kategori
                 Text(
                   'Kategori',
                   style: TextStyle(
@@ -186,7 +178,6 @@ class _TambahMateriState extends State<TambahMateri> {
                 ),
                 SizedBox(height: 16),
 
-                // Konten
                 Text(
                   'Konten Materi',
                   style: TextStyle(
@@ -212,7 +203,6 @@ class _TambahMateriState extends State<TambahMateri> {
                 ),
                 SizedBox(height: 24),
 
-                // Soal Section
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -236,7 +226,6 @@ class _TambahMateriState extends State<TambahMateri> {
                 ),
                 SizedBox(height: 12),
 
-                // List Soal
                 if (_soalList.isEmpty)
                   Container(
                     padding: EdgeInsets.all(20),
@@ -259,7 +248,6 @@ class _TambahMateriState extends State<TambahMateri> {
 
                 SizedBox(height: 24),
 
-                // Save Button
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -312,7 +300,6 @@ class _TambahMateriState extends State<TambahMateri> {
   }
 }
 
-// MATERI: INHERITANCE - Dialog widget terpisah
 class _SoalDialog extends StatefulWidget {
   final Function(Map<String, dynamic>) onAdd;
 
@@ -324,7 +311,6 @@ class _SoalDialog extends StatefulWidget {
 
 class _SoalDialogState extends State<_SoalDialog> {
   final TextEditingController _pertanyaanController = TextEditingController();
-  // MATERI: GENERIC - List controllers
   final List<TextEditingController> _optionControllers = [
     TextEditingController(),
     TextEditingController(),
@@ -357,7 +343,7 @@ class _SoalDialogState extends State<_SoalDialog> {
         ),
         SizedBox(height: 12),
         ...List.generate(4, (index) {
-          String label = String.fromCharCode(65 + index); // A, B, C, D
+          String label = String.fromCharCode(65 + index);
           return Padding(
             padding: EdgeInsets.only(bottom: 8),
             child: Row(

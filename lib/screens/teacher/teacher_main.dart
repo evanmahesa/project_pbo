@@ -3,7 +3,6 @@ import 'package:project_pbo/screens/teacher/dashboard_teacher.dart';
 import 'package:project_pbo/screens/teacher/kelola_materi.dart';
 import 'package:project_pbo/screens/teacher/profile_teacher.dart';
 
-// MATERI: INHERITANCE
 class TeacherMain extends StatefulWidget {
   final Map<String, dynamic> userData;
 
@@ -13,11 +12,9 @@ class TeacherMain extends StatefulWidget {
   State<TeacherMain> createState() => _TeacherMainState();
 }
 
-// MATERI: ENCAPSULATION
 class _TeacherMainState extends State<TeacherMain> {
   int _currentIndex = 0;
 
-  // MATERI: GENERIC - List<Widget>
   late List<Widget> _pages;
 
   @override

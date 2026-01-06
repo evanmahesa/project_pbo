@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 
-// MATERI: INHERITANCE
 class EditMateri extends StatefulWidget {
   final String materiId;
   final Map<String, dynamic> materiData;
@@ -19,7 +18,6 @@ class EditMateri extends StatefulWidget {
   State<EditMateri> createState() => _EditMateriState();
 }
 
-// MATERI: ENCAPSULATION
 class _EditMateriState extends State<EditMateri> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _judulController;
@@ -56,7 +54,6 @@ class _EditMateriState extends State<EditMateri> {
     super.dispose();
   }
 
-  // MATERI: ASYNC & AWAIT
   Future<void> _updateMateri() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -217,7 +214,6 @@ class _EditMateriState extends State<EditMateri> {
                     ),
                     ElevatedButton.icon(
                       onPressed: () {
-                        // Same dialog as TambahMateri
                         Get.snackbar(
                           'Info',
                           'Fitur tambah soal dalam edit (implementasi sama dengan tambah materi)',

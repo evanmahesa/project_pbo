@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserModel {
-  final String uid; // UID dari Firebase Auth
+  final String uid;
   final String email;
   final String nama;
-  final String role; // 'siswa' atau 'guru'
-  final String? nis; // Hanya untuk siswa
-  final String? nip; // Hanya untuk guru
-  final DateTime? createdAt; // Timestamp dari Firestore
+  final String role;
+  final String? nis;
+  final String? nip;
+  final DateTime? createdAt;
 
   UserModel({
     required this.uid,
@@ -19,7 +19,6 @@ class UserModel {
     this.createdAt,
   });
 
-  // Factory constructor untuk membuat UserModel dari Map (dari Firestore)
   factory UserModel.fromMap(String uid, Map<String, dynamic> data) {
     return UserModel(
       uid: uid,
@@ -34,7 +33,6 @@ class UserModel {
     );
   }
 
-  // Method untuk mengubah UserModel ke Map (untuk disimpan ke Firestore)
   Map<String, dynamic> toMap() {
     return {
       'email': email,
@@ -48,7 +46,6 @@ class UserModel {
     };
   }
 
-  // Method untuk copy (berguna untuk update data)
   UserModel copyWith({
     String? uid,
     String? email,
@@ -69,7 +66,6 @@ class UserModel {
     );
   }
 
-  // Override toString untuk debugging
   @override
   String toString() {
     return 'UserModel(uid: $uid, email: $email, nama: $nama, role: $role, nis: $nis, nip: $nip, createdAt: $createdAt)';

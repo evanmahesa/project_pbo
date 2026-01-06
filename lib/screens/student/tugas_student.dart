@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-// MATERI: INHERITANCE
 class TugasStudent extends StatelessWidget {
   final Map<String, dynamic> userData;
 

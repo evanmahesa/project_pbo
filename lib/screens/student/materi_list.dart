@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-// Import halaman detail materi jika ada, misalnya:
-// import 'package:project_pbo/student/materi_detail.dart';
+import 'detail_materi.dart';
 
 class MateriList extends StatefulWidget {
   final String kategori;
@@ -48,7 +47,6 @@ class _MateriListState extends State<MateriList> {
               );
             }
 
-            // Filter client-side to support missing/null kategori values ("Lainnya")
             final docs = snapshot.data!.docs.where((d) {
               final data = d.data() as Map<String, dynamic>;
               final raw = data['kategori'];
@@ -78,14 +76,7 @@ class _MateriListState extends State<MateriList> {
 
                 return GestureDetector(
                   onTap: () {
-                    // Navigasi ke detail materi atau quiz
-                    // Misalnya: Get.to(() => MateriDetail(materiId: doc.id));
-                    // Jika belum ada, bisa tampilkan snackbar sementara
-                    Get.snackbar(
-                      'Info',
-                      'Navigasi ke detail materi belum diimplementasi',
-                      snackPosition: SnackPosition.BOTTOM,
-                    );
+                    Get.to(() => MateriDetail(materiId: doc.id));
                   },
                   child: Container(
                     margin: EdgeInsets.only(bottom: 12),

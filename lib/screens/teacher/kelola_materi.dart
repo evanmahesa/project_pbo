@@ -4,13 +4,11 @@ import 'package:get/get.dart';
 import 'package:project_pbo/screens/teacher/tambah_materi.dart';
 import 'package:project_pbo/screens/teacher/edit_materi.dart';
 
-// MATERI: INHERITANCE
 class KelolaMateri extends StatelessWidget {
   final Map<String, dynamic> userData;
 
   const KelolaMateri({super.key, required this.userData});
 
-  // MATERI: ASYNC & AWAIT - Delete function
   Future<void> _deleteMateri(String materiId) async {
     try {
       await FirebaseFirestore.instance
@@ -105,7 +103,6 @@ class KelolaMateri extends StatelessWidget {
                 child: Container(
                   margin: EdgeInsets.symmetric(horizontal: 16),
                   child: StreamBuilder<QuerySnapshot>(
-                    // MATERI: ASYNC - Real-time data stream
                     stream: FirebaseFirestore.instance
                         .collection('materi')
                         .orderBy('timestamp', descending: true)
@@ -149,7 +146,6 @@ class KelolaMateri extends StatelessWidget {
                         );
                       }
 
-                      // MATERI: GENERIC - List with map
                       return ListView.builder(
                         itemCount: snapshot.data!.docs.length,
                         itemBuilder: (context, index) {
@@ -270,7 +266,6 @@ class KelolaMateri extends StatelessWidget {
     );
   }
 
-  // MATERI: POLYMORPHISM - Different return based on input
   IconData _getKategoriIcon(String kategori) {
     switch (kategori.toLowerCase()) {
       case 'grammar':
